@@ -2,6 +2,7 @@
 #include <pthread.h>
 #include <iostream>
 #include <unistd.h>
+#include <sys/time.h>
 
 pthread_mutex_t g_mutex; // 互斥锁
 using namespace std;
@@ -11,6 +12,7 @@ int value = 0;
 int idx = 0;
 bool read_state = true;
 
+// 参数arg为默认计数时间(单位s)
 void *thread(void *arg)
 {
     try
@@ -27,8 +29,9 @@ void *thread(void *arg)
         }
 
         printf("This is a thread and arg = %d.\n", *(int *)arg);
-        *(int *)arg = 0;
-        while (read_state) // 3.1 的情况
+        
+        int timeEnd = time(NULL) + *(int *)arg;
+        while (read_state && (time(NULL) < timeEnd))  // 3.1 的情况 + 3.2 的情况
         {
             if (idx >= 20)
             {
@@ -42,13 +45,14 @@ void *thread(void *arg)
             }
         }
     }
-    catch (...) // 3.2 的情况
+    catch (...) // 3.3 的情况
     {
         cout << "get error" << endl;
     }
     // 3. 互斥锁的状态由 非EBUSY->EBUSY 的情况如下:
     // 3.1 主进程将read_state变为false
-    // 3.2 进程工作时出错
+    // 3.2 记录时间到
+    // 3.3 进程工作时出错
     pthread_mutex_unlock(&g_mutex);
 
     return arg;
@@ -66,7 +70,7 @@ int main(int argc, char *argv[])
 {
     pthread_t th;
     int ret;
-    int arg = 10;
+    int arg = 2;
     int *thread_ret = NULL;
     // 1. 首次创建线程, 互斥锁的状态不为 EBUSY --> 正常创建线程 并将互斥锁的状态变为 EBUSY
     ret = pthread_create(&th, NULL, thread, &arg);
