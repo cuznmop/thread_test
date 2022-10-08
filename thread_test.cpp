@@ -14,17 +14,29 @@ bool read_state = true;
 
 void *thread(void *arg)
 {
-    printf("This is a thread and arg = %d.\n", *(int *)arg);
-    *(int *)arg = 0;
-    while(read_state)
+    try
     {
-        if(idx>=20)
+        printf("This is a thread and arg = %d.\n", *(int *)arg);
+        *(int *)arg = 0;
+        while(read_state)
         {
-            idx = 0;
-        }
-        usleep(90000);
-        arr[idx++] = value++;
+            if(idx>=20)
+            {
+                idx = 0;
+            }
+            usleep(90000);
+            arr[idx++] = value++;
+            if (value == 8)
+            {
+                throw "test error";
+            }
+        }        
     }
+    catch(...)
+    {
+        cout << "get error" << endl;
+    }
+    
     return arg;
 }
 
