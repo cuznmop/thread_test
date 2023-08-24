@@ -14,7 +14,7 @@
    1.PTHREAD_RUNNING_TIME=2, PTHREAD_OPEN_AGAIN_TIME=4, READ_STATE_CHANGE_TIME=3, 线程会正常启动2次, 因超时结束线程2次
    2.PTHREAD_RUNNING_TIME=2, PTHREAD_OPEN_AGAIN_TIME=4, READ_STATE_CHANGE_TIME=1, 线程会正常启动2次, 因超时结束线程1次, 因read_state状态改变结束线程1次
    3.PTHREAD_RUNNING_TIME=3, PTHREAD_OPEN_AGAIN_TIME=1, READ_STATE_CHANGE_TIME=1, 线程会正常启动1次, 第二次启动会因为互斥锁的原因直接结束尔不进行计数
-   4.在1的基础上将ERROR_NUM由666改为66, 线程会出错, 但是不会影响主进程正常工作; 此外, 由于catch(...)接到了线程错误, 使得报误的线程可以正常推出, 并不影响线程的再次启动
+   4.在1的基础上将ERROR_NUM由666改为66, 线程会出错, 但是不会影响主进程正常工作; 此外, 由于catch(...)接到了线程错误, 使得报误的线程可以正常退出, 并不影响线程的再次启动
      可以根据输出得知线程错误后将互斥锁释放, 使得下次线程还会继续启动
 */
 
